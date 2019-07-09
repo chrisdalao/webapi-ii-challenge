@@ -8,5 +8,5 @@ server.get('/', (req, res) => {
 })
 
 server.listen(9000, () => {
-    console.log('Server running on localhost')
+    console.log('Server running on localhost:9000')
 })

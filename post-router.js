@@ -89,4 +89,26 @@ router.get('/:id/comments', (req, res) => {
         })
 })
 
+router.put('/:id', (req, res) => {
+    const { id } = req.params;
+    const changes = req.body;
+
+    if (!id) {
+        res.status(404).json({ message: "The post with the specified ID does not exist." });
+    } else if (!changes.title || !changes.contents) {
+        res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
+    } else {
+        Posts.update(id, changes)
+            .then(updated => {
+                if (updated) {
+                    res.status(200).json(changes);
+                }
+            })
+            .catch(err => {
+                err = { error: "The post information could not be modified." };
+                req.status(500).json(err);
+            })
+    }
+})
+
 module.exports = router;

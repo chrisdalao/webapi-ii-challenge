@@ -4,6 +4,47 @@ const Posts = require('./data/db.js');
 
 const router = express.Router();
 
+router.use(express.json());
+
+router.post('/', (req, res) => {
+    const postData = req.body;
+    if (!postData.title || !postData.contents) {
+        res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
+    } else {
+        Posts.insert(postData)
+            .then(post => {
+                if (post) {
+                    res.status(201).json(postData)
+                }
+            })
+            .catch(err => {
+                err = { error: "There was an error while saving the post to the database" };
+                res.status(500).json(err)
+            })
+    }
+})
+
+router.post('/:id/comments', (req, res) => {
+    const { text } = req.body;
+    const post_id = parseInt(req.params.id);
+    const postComment = ({ text, post_id })
+    if (!postComment.post_id) {
+        res.status(404).json({ message: "The post with the specified ID does not exist." });
+    } else if (!postComment.text) {
+        res.status(400).json({ errorMessage: "Please provide text for the comment." })
+    } else {
+        Posts.insertComment(postComment)
+            .then(result => {
+                res.status(201).json(result);
+            })
+            .catch(err => {
+                err = { error: "There was an error while saving the comment to the database" };
+                res.status(500).json(err)
+            })
+    }
+})
+
+
 router.get('/', (req, res) => {
     Posts.find()
         .then(posts => {
